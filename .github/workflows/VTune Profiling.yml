@@ -1,0 +1,27 @@
+name: VTune Profiling
+
+on: [push, pull_request]
+
+jobs:
+  vtune:
+    runs-on: ubuntu-latest
+    steps:
+      - name: Checkout Repository
+        uses: actions/checkout@v4
+
+      - name: Install VTune Profiler
+        run: |
+          wget https://registrationcenter-download.intel.com/akdlm/irc_nas/18819/vtune_profiler_2024.tar.gz
+          tar -xvzf vtune_profiler_2024.tar.gz
+          cd vtune_profiler_2024
+          sudo ./install.sh --silent
+
+      - name: Run VTune Profiler
+        run: |
+          vtune -collect hotspots -result-dir vtune_results ./ProBioNanoTech
+          
+      - name: Upload VTune Results
+        uses: actions/upload-artifact@v3
+        with:
+          name: vtune-results
+          path: vtune_results/
